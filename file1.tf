@@ -1,3 +1,4 @@
+
 # Configure the AWS Provider
 provider "aws" {
   region = "ap-south-1"  # Change to your preferred region
@@ -16,7 +17,7 @@ resource "aws_instance" "example" {
   
   # Optional: Add tags
   tags = {
-    Name = "Ex-ec2"
+    Name = "Example"
     Environment = "Test"
   }
   
