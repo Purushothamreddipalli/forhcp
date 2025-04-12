@@ -16,7 +16,7 @@ resource "aws_instance" "example" {
   
   # Optional: Add tags
   tags = {
-    Name = "ExampleEC2"
+    Name = "Example"
     Environment = "Test"
   }
   
