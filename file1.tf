@@ -4,7 +4,7 @@ provider "aws" {
 
 # Security group to allow SSH access
 resource "aws_security_group" "ec2_sg" {
-  name        = "ec2_sg"
+  name        = "All-Traffic"
   description = "Allow SSH inbound traffic"
 
   ingress {
