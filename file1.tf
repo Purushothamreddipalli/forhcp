@@ -1,70 +1,37 @@
-
-# Configure the AWS Provider
 provider "aws" {
-  region = "ap-south-1"  # Change to your preferred region
+  region = "ap-south-1" # Mumbai region
 }
 
-# Create an EC2 instance
-resource "aws_instance" "example" {
-  ami           = "ami-002f6e91abff6eb96"  # Amazon Linux 2 AMI (update based on region)
-  instance_type = "t2.micro"               # Free tier eligible instance type
-  
-  # Optional: Add a key pair for SSH access
-  key_name      = "allinonelock"           # Replace with your key pair name
-  
-  # Optional: Security group to allow SSH
-  vpc_security_group_ids = [aws_security_group.example_sg.id]
-  
-  # Optional: Add tags
-  tags = {
-    Name = "Example"
-    Environment = "Test"
-  }
-  
-  # Optional: User data to run at launch
-  user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y httpd
-              systemctl start httpd
-              systemctl enable httpd
-              echo "<h1>Hello from Terraform EC2</h1>" > /var/www/html/index.html
-              EOF
-}
+# Security group to allow SSH access
+resource "aws_security_group" "ec2_sg" {
+  name        = "ec2_sg"
+  description = "Allow SSH inbound traffic"
 
-# Create a security group
-resource "aws_security_group" "example_sg" {
-  name        = "example-sg"
-  description = "Allow SSH and HTTP"
-  
   ingress {
+    description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Warning: This allows SSH from anywhere
+    cidr_blocks = ["0.0.0.0/0"] # Allow from anywhere (for testing)
   }
-  
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
-  tags = {
-    Name = "example-sg"
-  }
 }
 
-# Optional: Output the public IP
-output "instance_public_ip" {
-  value       = aws_instance.example.public_ip
-  description = "The public IP address of the EC2 instance"
+# Launch 3 EC2 instances using the given AMI ID and key pair
+resource "aws_instance" "amazon_linux_ec2" {
+  count         = 3
+  ami           = "ami-002f6e91abff6eb96" # Custom Amazon Linux 2 AMI ID
+  instance_type = "t2.micro"
+  key_name      = "ALL" # ✅ Your key pair name (just the name, not .pem)
+  security_groups = [aws_security_group.ec2_sg.name]
+
+  tags = {
+    Name = "AmazonLinux2-EC2-${count.index + 1}"
+  }
 }
